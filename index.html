@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voli RQZ su IVAO</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h2>Voli IVAO con callsign RQZ</h2>
+  <table id="flightsTable">
+    <thead>
+      <tr>
+        <th>Callsign</th>
+        <th>Partenza</th>
+        <th>Destinazione</th>
+        <th>Online da</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    fetch('https://api.ivao.aero/v2/tracker/whazzup')
+      .then(response => response.json())
+      .then(data => {
+        const tbody = document.querySelector("#flightsTable tbody");
+        const pilots = data.clients.pilots;
+
+        pilots
+          .filter(p => p.callsign && p.callsign.startsWith("RQZ"))
+          .forEach(p => {
+            const row = document.createElement("tr");
+
+            const callsign = p.callsign;
+            const dep = p.flightPlan?.departureId || "N/A";
+            const arr = p.flightPlan?.arrivalId || "N/A";
+            const onlineSince = new Date(p.logonTime).toLocaleString();
+
+            row.innerHTML = `<td>${callsign}</td><td>${dep}</td><td>${arr}</td><td>${onlineSince}</td>`;
+            tbody.appendChild(row);
+          });
+      });
+  </script>
+</body>
+</html>
